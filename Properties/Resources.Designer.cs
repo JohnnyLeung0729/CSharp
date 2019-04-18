@@ -59,5 +59,41 @@ namespace small_ant.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   查找类似 捕获端口信息： 的本地化字符串。
+        /// </summary>
+        internal static string catchportstatus {
+            get {
+                return ResourceManager.GetString("catchportstatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 错误 的本地化字符串。
+        /// </summary>
+        internal static string errorTitle {
+            get {
+                return ResourceManager.GetString("errorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 有设备变动- 的本地化字符串。
+        /// </summary>
+        internal static string hasDevChangeStatus {
+            get {
+                return ResourceManager.GetString("hasDevChangeStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 连接错误，也许没有加载配置ini文件，或配置ini文件中没有设置开放端口值 的本地化字符串。
+        /// </summary>
+        internal static string iniPortError {
+            get {
+                return ResourceManager.GetString("iniPortError", resourceCulture);
+            }
+        }
     }
 }

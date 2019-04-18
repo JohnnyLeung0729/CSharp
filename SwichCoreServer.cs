@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Net.Sockets;
 using System.Net;
 using u2ec_example.socket;
+using small_ant.config;
 
 namespace u2ec_example
 {
@@ -23,26 +24,15 @@ namespace u2ec_example
         /// Port端口状态变化激活监听管理
         /// </summary>
         public event u2ec.OnChangeDevList MyCall;
-
-        /// <summary>
-        /// 配置接收端口
-        /// </summary>
-        private string confport;
-        /// <summary>
-        /// 延迟时间
-        /// </summary>
-        private string delaytime;
-        /// <summary>
-        /// 纳税人识别号
-        /// </summary>
-        private string nsrsbh;
-        private string kjh;
-        private string hbpath;
+        
         List<String> lssharedport = new List<string>();
         private TreeView TreeViewServer = new TreeView();
         private TreeNode node = new TreeNode();
-        private Dictionary<String, String> dictionary;
+        //private Dictionary<String, String> dictionary;
         private Heartbeat heartbeat;
+
+        private String syspath;
+        LoadIniConfigFile licf;
 
         public SwitchCoreServer()
         {
@@ -51,108 +41,50 @@ namespace u2ec_example
             MyCall += new u2ec.OnChangeDevList(SwitchCoreServer_MyCall);
             u2ec.SetCallBackOnChangeDevList(MyCall);
 
-            ConfigFileInit();
+            syspath = Environment.CurrentDirectory + "\\config.ini";
+            licf = new LoadIniConfigFile(syspath);
+            Trace.WriteLine("Load Syspath configpath.ini file status is:--- --- " + licf.initConfig().ToString());
 
-            heartbeat = new Heartbeat(hbpath);
+            heartbeat = new Heartbeat(licf.Ic.Heartbeat.Hbpath);
 
             //获取所有的共享设备
             showshared();
             //判断是否有共享的设备，如果没有共享的设备，则判断是否配置文件有配置端口，如果有则开放该接口共享
             if (lssharedport.Count < 1)
             {
-                if (!confport.Equals("null"))
+                if (!licf.Ic.Server.Port.Equals(0))
                 {
-                    u2ec.ClientAddRemoteDevManually(confport);
+                    u2ec.ClientAddRemoteDevManually(licf.Ic.Server.Port.ToString());
                     showshared();
                     int SelectedIndex = 0;
                     u2ec.ClientStartRemoteDev(HandleClient, SelectedIndex, true, "");
                 }
-                else {
+                else
+                {
                     MessageBox.Show("connect error,system config is null");
                 }
             }
             txt_port_stat.Text = "没有监听的接口状态";
-            for (int i = 0; i < lssharedport.Count; i++) {
-                if(getPortStat(i).Split('/')[1].Equals(confport)){
+            for (int i = 0; i < lssharedport.Count; i++)
+            {
+                if (getPortStat(i).Split('/')[1].Equals(licf.Ic.Server.Port.ToString()))
+                {
                     txt_port_stat.Text = getPortStat(i);
                     txt_connectcontext.Text = lssharedport[i];
                 }
             }
-            
+
             //进入正常运行，判断端口状态
             //监控程序运行
 
             SwitchCoreServer_MyCall();
 
-            Console.WriteLine("System start finished in"+DateTime.Now.ToString());
+            Console.WriteLine("System start finished in" + DateTime.Now.ToString());
             Trace.WriteLine("System start finished in" + DateTime.Now.ToString());
 
 
 
         }
-
-        /// <summary>
-        /// 对配置文件进行分析解释，分配数据到字典中
-        /// 并且根据反馈情况将参数同步到系统变量中
-        /// 所以对于配置文件的参数有限制，不得缺少相对应参数，否则系统将运行不正常
-        /// </summary>
-        /// <returns>一个关于系统配置文件参数的字典</returns>
-        private Dictionary<String,String> ConfigFileInit(){
-            dictionary = new Dictionary<String, String>();
-            OPini oi = new OPini(Environment.CurrentDirectory + "\\config.ini");
-            confport = oi.ReadString("SERVER", "port", "null");
-            dictionary.Add("port", confport);
-            txt_confport.Text = confport;
-            confport = oi.ReadString("LISTEN", "port", "null");
-            dictionary.Add("listenport", confport);
-            txt_listenport.Text = confport;
-            delaytime = oi.ReadString("DELAY", "time", "0");
-            dictionary.Add("delaytime", delaytime);
-            txt_kpDelay.Text = delaytime;
-            nsrsbh = oi.ReadString("HEARTBEAT", "nsrsbh", "0");
-            dictionary.Add("nsrsbh", nsrsbh);
-            this.Text += "【"+nsrsbh+":";
-            kjh = oi.ReadString("HEARTBEAT", "kjh", "0");
-            dictionary.Add("kjh", kjh);
-            this.Text += kjh + "】";
-            hbpath = oi.ReadString("HEARTBEAT", "hbpath", "0");
-            dictionary.Add("hbpath", hbpath);//心跳地址
-
-
-            Boolean bflag = true;
-            int counter = 0;
-            while (bflag){
-                String ps=oi.ReadString("PROCESS","p-"+counter.ToString(),"null");
-                if (!ps.Equals("null"))
-                {
-                    dictionary.Add("p-" + counter.ToString(), ps);
-                    counter += 1;
-                }
-                else {
-                    bflag = false;
-                    counter = 0;
-                }
-            }
-            bflag = true;
-            while (bflag) {
-                String ps = oi.ReadString("PROCESS", "s-" + counter.ToString(), "null");
-                if (!ps.Equals("null"))
-                {
-                    dictionary.Add("s-" + counter.ToString(), ps);
-                    counter += 1;
-                }
-                else
-                {
-                    bflag = false;
-                    counter = 0;
-                }
-            }
-
-
-            return dictionary;
-        }
-
-        
 
         void SwitchCoreServer_MyCall()
         {
@@ -196,7 +128,8 @@ namespace u2ec_example
         private void FlushDevListToBox()
         {
             listBoxDev.Items.Clear();
-            for (int i = 0; i < node.Nodes.Count; i++) {
+            for (int i = 0; i < node.Nodes.Count; i++)
+            {
                 listBoxDev.Items.Add(node.Nodes[i].Text);
             }
         }
@@ -250,7 +183,8 @@ namespace u2ec_example
             MessageBox.Show(req);
         }
 
-        private void setrecive(){
+        private void setrecive()
+        {
             SocketTL stl = new SocketTL();
             stl.connectwait();
         }
@@ -267,25 +201,27 @@ namespace u2ec_example
 
             for (int i = 0; i < lssharedport.Count; i++)
             {
-                if (getPortStat(i).Split('/')[1].Equals(confport))
+                if (getPortStat(i).Split('/')[1].Equals(licf.Ic.Server.Port.ToString()))
                 {
                     txt_port_stat.Text = getPortStat(i);
-                    String tempstr=txt_connectcontext.Text;
+                    String tempstr = txt_connectcontext.Text;
                     txt_connectcontext.Text = lssharedport[i];
 
-                    if (tempstr.Split('/').Length < lssharedport[i].Split('/').Length) {
+                    if (tempstr.Split('/').Length < lssharedport[i].Split('/').Length)
+                    {
                         //连接设备
                         if (lssharedport[i].Split('/').Length > 2)
                         {
                             //连接设备发送设备连接心跳码
-                            heartbeat.postHeartbeat(heartbeat.genDataStr01(nsrsbh, kjh, "0"));
+                            heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "0"));
                             for (int j = 0; j < 5; j++)
                             {
                                 try
                                 {
-                                    String filepathname = dictionary["s-" + j.ToString()];
-                                    String[] stemp=filepathname.Split('.');
-                                    if (stemp.Length > 1) {
+                                    String filepathname = licf.Ic.Process.S["s-" + j.ToString()];
+                                    String[] stemp = filepathname.Split('.');
+                                    if (stemp.Length > 1)
+                                    {
                                         if (stemp[1].Equals("lnk"))
                                         {
                                             //Process.Start(filepathname);
@@ -295,7 +231,7 @@ namespace u2ec_example
                                         else
                                         {
                                             Thread threadC = new Thread(closeApp);
-                                            threadC.Start(dictionary["s-" + j.ToString()]);
+                                            threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
                                         }
                                     }
                                 }
@@ -303,7 +239,8 @@ namespace u2ec_example
                                 {
                                     Console.Write(ex.Message);
                                 }
-                                catch (NullReferenceException ne) {
+                                catch (NullReferenceException ne)
+                                {
                                     Console.Write(ne.Message);
                                 }
                             }
@@ -313,20 +250,21 @@ namespace u2ec_example
                     {
                         //断开设备
                         //断开设备发送设备连接心跳码
-                        heartbeat.postHeartbeat(heartbeat.genDataStr01(nsrsbh, kjh, "3"));
+                        heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "3"));
                         for (int j = 0; j < 5; j++)
                         {
                             try
                             {
-                                if(listBoxlog.Items.Count>400)listBoxlog.Items.Clear();
-                                listBoxlog.Items.Add(dictionary["p-" + j.ToString()]);
-                                System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcessesByName(dictionary["p-"+j.ToString()]);
+                                if (listBoxlog.Items.Count > 400) listBoxlog.Items.Clear();
+                                listBoxlog.Items.Add(licf.Ic.Process.P["p-" + j.ToString()]);
+                                System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcessesByName(licf.Ic.Process.P["p-" + j.ToString()]);
                                 foreach (System.Diagnostics.Process p in ps)
                                 {
                                     p.Kill();
                                 }
                             }
-                            catch (KeyNotFoundException enfx) {
+                            catch (KeyNotFoundException enfx)
+                            {
                                 Console.Write(enfx.Message);
                             }
                             catch (Exception ex)
@@ -335,7 +273,8 @@ namespace u2ec_example
                             }
                         }
                     }
-                    else { 
+                    else
+                    {
                         //没有啥变化
                     }
                 }
@@ -347,10 +286,11 @@ namespace u2ec_example
             lssharedport.Clear();
             int sumport = 0;
             object Name = null;
-            for (int index = 0; BuildClientName(Handle, index, out Name); ++index) {
+            for (int index = 0; BuildClientName(Handle, index, out Name); ++index)
+            {
                 Console.WriteLine(Name);
                 lssharedport.Add(Convert.ToString(Name));
-                sumport += 1;       
+                sumport += 1;
             }
 
             txt_portnum.Text = sumport.ToString();
@@ -399,7 +339,7 @@ namespace u2ec_example
 
         private void btn_addport_Click(object sender, EventArgs e)
         {
-            u2ec.ClientAddRemoteDevManually(confport);
+            u2ec.ClientAddRemoteDevManually(licf.Ic.Server.Port.ToString());
             //ListBoxClient_SelectedIndexChanged(this, null);
             showshared();
         }
@@ -434,7 +374,8 @@ namespace u2ec_example
 
         }
 
-        private String getPortStat(int indexs) {
+        private String getPortStat(int indexs)
+        {
             int State = 0;
             object Host = null;
             object NetSettings = null;
@@ -512,7 +453,7 @@ namespace u2ec_example
             object Name = null;
             if (BuildClientName(HandleClient, index, out Name))
                 Console.WriteLine(Name);
-                //ListBoxClient.Items[index] = Name;
+            //ListBoxClient.Items[index] = Name;
 
             //ListBoxClient_SelectedIndexChanged(this, null);
             showshared();
@@ -520,13 +461,17 @@ namespace u2ec_example
 
         private void button3_Click(object sender, EventArgs e)
         {
+            LoadIniConfigFile licf = new LoadIniConfigFile(Environment.CurrentDirectory + "\\config.ini");
+            MessageBox.Show(licf.initConfig().ToString());
+            MessageBox.Show(licf.Ic.Heartbeat.Hbpath);
+
             //OPini.InitSystem();
 
             //MessageBox.Show(this.node.Nodes.Count.ToString());
 
             //SwitchCoreServer_MyCall();
 
-            showshared();
+            //showshared();
 
             //try
             //{
@@ -538,13 +483,16 @@ namespace u2ec_example
             //    Console.Write(ex.Message);
             //}
 
-            Process[] procs = Process.GetProcesses();
-            listBoxP.Items.Clear();
-            for (int i = 0; i < procs.Length; i++)
-            {
-                Process q = procs[i];
-                listBoxP.Items.Add(q.ProcessName);
-            }
+            //Process[] procs = Process.GetProcesses();
+            //listBoxP.Items.Clear();
+            //for (int i = 0; i < procs.Length; i++)
+            //{
+            //    Process q = procs[i];
+            //    listBoxP.Items.Add(q.ProcessName);
+            //}
+
+
+
             //Process p = procs[0];
             //int procId = p.Id;
             //Process p2 = Process.GetProcessById(procId);
@@ -632,24 +580,24 @@ namespace u2ec_example
             Thread.Sleep(flushDelayTime());
             try
             {
-                Process.Start(Convert.ToString(dic));
+                System.Diagnostics.Process.Start(Convert.ToString(dic));
             }
-            catch (Win32Exception ex) {
+            catch (Win32Exception ex)
+            {
                 Console.WriteLine(ex.Message);
                 MessageBox.Show("通常这个问题是因为配置文件中需要启动的程序路径不正确导致，请检查配置文件，若仍然无法解决，请联系开发者！", "启动故障", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private int flushDelayTime() {
-            dictionary["delaytime"] = txt_kpDelay.Text;
-            int i = Convert.ToInt32(dictionary["delaytime"]);
-            return i * 1000;
+        private int flushDelayTime()
+        {
+            return licf.Ic.Delay.Time * 1000;
         }
 
         public static void RunCmdWithoutResult(string file, string command, bool wait)
         {
             //创建实例
-            Process p = new Process();
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
             //设定调用的程序名，不是系统目录的需要完整路径
             p.StartInfo.FileName = file;
             //传入执行参数
@@ -717,7 +665,7 @@ namespace u2ec_example
 
         }
 
-        
+
         public void ReceiveMsg()
         {
             //while (true)
@@ -740,22 +688,22 @@ namespace u2ec_example
                 client.Close();
             }
         }
- 
-         public void SetText(string text)
-        {   
+
+        public void SetText(string text)
+        {
             //在这里，我强调一下，为什么我会用invoke呢，或许很多人对此不太了解，如果不用的话，会报错。我会另外抽时间给大家讲解下invoke,beigninvoke，多线程，委托与事件之间的联系的，反正大家先这么写着。
-            if(rtxt_resmsg.InvokeRequired)
+            if (rtxt_resmsg.InvokeRequired)
             {
                 SetTextCallBack st = new SetTextCallBack(SetText);
-                this.Invoke(st,new object[]{text});
-                
+                this.Invoke(st, new object[] { text });
+
             }
             else
             {
                 rtxt_resmsg.Text += DateTime.Now.ToString() + "\n" + text + "\n" + "abcdefgBJZSXX";
             }
         }
-    
+
 
 
 

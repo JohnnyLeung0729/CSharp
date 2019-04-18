@@ -1,4 +1,5 @@
-﻿using System;
+﻿using small_ant;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace u2ec_example
             //Application.Run(new FrmClientServices());
             //SwitchCoreServer scs = new SwitchCoreServer();
             //scs.ShowDialog();
-            Application.Run(new SwitchCoreServer());
+            Application.Run(new SmallAnt());
         }
     }
 }

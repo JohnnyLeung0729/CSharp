@@ -5,6 +5,7 @@ public class u2ec
 {
     public const int STATE_WAITING = 1;
     public const int STATE_CONNECTED = 2;
+    public const int STATE_ADDED = 0;
 
     [DllImport("u2ec.dll")]
     public static extern bool ServerCreateEnumUsbDev(out IntPtr Context);

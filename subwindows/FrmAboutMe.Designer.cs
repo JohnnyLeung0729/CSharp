@@ -35,35 +35,35 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(30, 22);
-            this.label1.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.label1.Location = new System.Drawing.Point(18, 13);
+            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(183, 32);
+            this.label1.Size = new System.Drawing.Size(105, 20);
             this.label1.TabIndex = 0;
             this.label1.Text = "系统版本号：";
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(38, 165);
-            this.richTextBox1.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.richTextBox1.Location = new System.Drawing.Point(14, 64);
+            this.richTextBox1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(839, 234);
+            this.richTextBox1.Size = new System.Drawing.Size(505, 142);
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "程序针对FW4.0优化了界面控件\n增加了心跳类，并在连接和断开税\n控盘的位置增加心跳诊断两处";
             // 
             // FrmAboutMe
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(240F, 240F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(872, 335);
+            this.ClientSize = new System.Drawing.Size(529, 220);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(904, 423);
+            this.MaximumSize = new System.Drawing.Size(551, 276);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(904, 423);
+            this.MinimumSize = new System.Drawing.Size(551, 276);
             this.Name = "FrmAboutMe";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

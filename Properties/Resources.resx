@@ -133,4 +133,12 @@
     <value>连接错误，也许没有加载配置ini文件，或配置ini文件中没有设置开放端口值</value>
     <comment>开放端口设置错误提示</comment>
   </data>
+  <data name="softstartcontext" xml:space="preserve">
+    <value>软重启过程大约20秒，请耐心等待，不要进行任何操作</value>
+    <comment>软重启内容</comment>
+  </data>
+  <data name="softstarttitle" xml:space="preserve">
+    <value>软重启</value>
+    <comment>软重启标题</comment>
+  </data>
 </root>

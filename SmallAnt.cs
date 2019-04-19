@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using u2ec_example.socket;
+using u2ec_example.subwindows;
 
 namespace small_ant
 {
@@ -31,6 +32,11 @@ namespace small_ant
         private String syspath;
         LoadIniConfigFile licf;
         #endregion
+
+        //保持连接状态锁
+        bool connectingLock;
+        string prestatus = "";
+        string statusfull = "";
 
         private IntPtr HandleServer;
         private IntPtr HandleClient;
@@ -54,7 +60,8 @@ namespace small_ant
             //初始化其余端口状态数值
             lbl_kpDelay.Text = licf.Ic.Delay.Time.ToString();
             lbl_listenport.Text = licf.Ic.Listen.Port.ToString();
-            this.Text = this.Text + "【"+licf.Ic.Heartbeat.Nsrsbh+":"+licf.Ic.Heartbeat.Kjh+"】";
+            this.Text = this.Text + "【" + licf.Ic.Heartbeat.Nsrsbh + ":" + licf.Ic.Heartbeat.Kjh + "】";
+            connectingLock = cb_waitclock.Checked;
 
             //心跳机制
             heartbeat = new Heartbeat(licf.Ic.Heartbeat.Hbpath);
@@ -79,15 +86,16 @@ namespace small_ant
                 else
                 {
                     Trace.WriteLine("init connect error,system config ini file is has null value");
-                    MessageBox.Show(small_ant.Properties.Resources.iniPortError,small_ant.Properties.Resources.errorTitle,MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    MessageBox.Show(small_ant.Properties.Resources.iniPortError, small_ant.Properties.Resources.errorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             lbl_port_stat.Text = "没有监听的接口状态";
             for (int i = 0; i < lssharedport.Count; i++)
             {
-                if (getPortStat(i).Split('/')[1].Equals(licf.Ic.Server.Port.ToString()))
+                btn_getstatus_Click(i, null);
+                if (statusfull.Split('/')[1].Equals(licf.Ic.Server.Port.ToString()))
                 {
-                    lbl_port_stat.Text = getPortStat(i);
+                    lbl_port_stat.Text = statusfull;
                     lbl_connectcontext.Text = lssharedport[i];
                 }
             }
@@ -106,6 +114,8 @@ namespace small_ant
             CreateServer();
             TreeViewServer_AfterSelect(this, null);
             showshared();
+
+            btn_getstatus_Click(null, null);
         }
 
         /// <summary>
@@ -151,96 +161,6 @@ namespace small_ant
             if (u2ec.ClientEnumAvailRemoteDev(out HandleClient))
                 EnumRemoteDev(HandleClient);   //枚举远程连接设备，本机作为客户端
 
-            //连接判断机制在此，在此也设置了心跳机制，并且，还在设置分步骤启动和关闭机制
-            for (int i = 0; i < lssharedport.Count; i++)
-            {
-                if (getPortStat(i).Split('/')[1].Equals(licf.Ic.Server.Port.ToString()))
-                {
-                    lbl_port_stat.Text = getPortStat(i);
-                    String tempstr = lbl_connectcontext.Text;
-                    lbl_connectcontext.Text = lssharedport[i];
-
-                    if (tempstr.Split('/').Length < lssharedport[i].Split('/').Length)
-                    {
-                        //连接设备
-                        if (lssharedport[i].Split('/').Length > 2)
-                        {
-                            //连接设备发送设备连接心跳码
-                            heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "0"));
-                            //遍历开启应用信息
-                            int applen = licf.Ic.Process.S.Count;
-                            for (int j = 0; j < applen; j++)
-                            {
-                                try
-                                {
-                                    String filepathname = licf.Ic.Process.S["s-" + j.ToString()];
-                                    String[] stemp = filepathname.Split('.');
-                                    if (stemp.Length > 1)
-                                    {
-                                        if (stemp[1].Equals("lnk"))
-                                        {
-                                            //Process.Start(filepathname);
-                                            Thread threadC = new Thread(closeApp);
-                                            threadC.Start(filepathname);
-                                        }
-                                        else
-                                        {
-                                            Thread threadC = new Thread(closeApp);
-                                            //threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
-                                            threadC.Start(filepathname);
-                                        }
-                                    }
-                                    else {
-                                        Thread threadC = new Thread(closeApp);
-                                        //threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
-                                        threadC.Start(filepathname);
-                                    }
-                                }
-                                catch (KeyNotFoundException ex)
-                                {
-                                    Console.Write(ex.Message);
-                                }
-                                catch (NullReferenceException ne)
-                                {
-                                    Console.Write(ne.Message);
-                                }
-                            }
-                        }
-                    }
-                    else if (tempstr.Split('/').Length > lssharedport[i].Split('/').Length)
-                    {
-                        //断开设备
-                        //断开设备发送设备连接心跳码
-                        heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "3"));
-                        int prolen = licf.Ic.Process.P.Count;
-                        for (int j = 0; j < prolen; j++)
-                        {
-                            try
-                            {
-                                if (listBoxPlog.Items.Count > 400) listBoxPlog.Items.Clear();
-                                listBoxPlog.Items.Add(licf.Ic.Process.P["p-" + j.ToString()]);
-                                System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcessesByName(licf.Ic.Process.P["p-" + j.ToString()]);
-                                foreach (System.Diagnostics.Process p in ps)
-                                {
-                                    p.Kill();
-                                }
-                            }
-                            catch (KeyNotFoundException enfx)
-                            {
-                                Console.Write(enfx.Message);
-                            }
-                            catch (Exception ex)
-                            {
-                                throw ex;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //没有啥变化
-                    }
-                }
-            }
         }
 
         private void EnumHubToList(IntPtr Context, IntPtr HubContext, TreeNode Parent)
@@ -276,63 +196,33 @@ namespace small_ant
             object Name = null;   //设备名称
             for (int index = 0; BuildClientName(Handle, index, out Name); ++index)
             {
-                Trace.WriteLine(small_ant.Properties.Resources.catchportstatus+"--- ---"+Name);
+                Trace.WriteLine(small_ant.Properties.Resources.catchportstatus + "--- ---" + Name);
                 lssharedport.Add(Convert.ToString(Name));   //EG:  Unknown/callback:20000
                 sumport += 1;
             }
 
             lbl_portnum.Text = sumport.ToString();   //刷新获取的接口数量
-            
-            
+
+
             //ListBoxClient.Items.Add(Name);
             //ListBoxClient_SelectedIndexChanged(this, null);
         }
 
-        private String getPortStat(int indexs)
-        {
-            int State = 0;
-            object Host = null;
-            object NetSettings = null;
-
-            if (u2ec.ClientGetRemoteDevNetSettings(HandleClient, indexs, out NetSettings))
-            {
-                u2ec.ClientGetStateRemoteDev(HandleClient, indexs, out State, out Host);
-
-                string result;
-                if (u2ec.STATE_CONNECTED == State)
-                    result = "connected";
-                else if (u2ec.STATE_WAITING == State)
-                    result = "connecting";
-                else
-                    result = "added";
-
-                result = result + "/" + NetSettings.ToString();
-                if (u2ec.STATE_CONNECTED == State)
-                    result = result + "/" + Host.ToString();
-                return result;
-
-            }
-            return "null";
-        }
-
         private void closeApp(object dic)
         {
-            Console.WriteLine(Convert.ToString(dic));
-            Thread.Sleep(flushDelayTime());
+            Trace.WriteLine("Start job path ::"+Convert.ToString(dic));
+            Thread.Sleep(licf.Ic.Delay.Time * 1000);
             try
             {
                 System.Diagnostics.Process.Start(Convert.ToString(dic));
             }
             catch (Win32Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Trace.WriteLine("Start job has error ::"+ex.Message);
                 MessageBox.Show("通常这个问题是因为配置文件中需要启动的程序路径不正确导致，请检查配置文件，若仍然无法解决，请联系开发者！", "启动故障", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private int flushDelayTime()
-        {
-            return licf.Ic.Delay.Time * 1000;
-        }
+
         private string BuildServerDevName(IntPtr Context, IntPtr HandleDev)
         {
             object strName = null;
@@ -410,6 +300,15 @@ namespace small_ant
             object Host = null;
             object NetSettings = null;
 
+            //在这里进行判断是否将index参数变成活动参数
+            if (sender != null)
+            {
+                if (sender.GetType().Equals(1.GetType()))
+                {
+                    index = Convert.ToInt32(sender);
+                }
+            }
+
             if (u2ec.ClientGetRemoteDevNetSettings(HandleClient, index, out NetSettings))
             {
                 u2ec.ClientGetStateRemoteDev(HandleClient, index, out State, out Host);
@@ -422,10 +321,100 @@ namespace small_ant
                 else
                     result = "added";
 
+                String tmp = result;//记录新刷出状态
+
                 result = result + "/" + NetSettings.ToString();
                 if (u2ec.STATE_CONNECTED == State)
                     result = result + "/" + Host.ToString();
-                MessageBox.Show(result);
+                statusfull = result;
+                if (e != null) MessageBox.Show(result);
+
+                //对状态进行操作，根据连接锁和状态进行判断，是否保持连接状态
+                if (!tmp.Equals(prestatus))
+                {
+                    if (cb_waitclock.Checked)
+                    {
+                        //如果没有连接，就打开连接，但是要勾选连接锁
+                        if (tmp.Equals("added")) tbtn_connect_Click(null, null);
+                        prestatus = tmp;
+                    }
+                    if (tmp.Equals("connected"))//设备连接事件
+                    {
+                        //连接设备发送设备连接心跳码
+                        heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "0"));
+                        //遍历开启应用信息
+                        int applen = licf.Ic.Process.S.Count;
+                        for (int j = 0; j < applen; j++)
+                        {
+                            try
+                            {
+                                String filepathname = licf.Ic.Process.S["s-" + j.ToString()];
+                                String[] stemp = filepathname.Split('.');
+                                if (stemp.Length > 1)
+                                {
+                                    if (stemp[1].Equals("lnk"))
+                                    {
+                                        //Process.Start(filepathname);
+                                        Thread threadC = new Thread(closeApp);
+                                        threadC.Start(filepathname);
+                                    }
+                                    else
+                                    {
+                                        Thread threadC = new Thread(closeApp);
+                                        //threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
+                                        threadC.Start(filepathname);
+                                    }
+                                }
+                                else
+                                {
+                                    Thread threadC = new Thread(closeApp);
+                                    //threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
+                                    threadC.Start(filepathname);
+                                }
+                            }
+                            catch (KeyNotFoundException ex)
+                            {
+                                Console.Write(ex.Message);
+                            }
+                            catch (NullReferenceException ne)
+                            {
+                                Console.Write(ne.Message);
+                            }
+                        }
+                    }
+                    else if (prestatus.Equals("connected"))//设备中断事件
+                    {
+                        //断开设备
+                        //断开设备发送设备连接心跳码
+                        heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "3"));
+                        int prolen = licf.Ic.Process.P.Count;
+                        for (int j = 0; j < prolen; j++)
+                        {
+                            try
+                            {
+                                if (listBoxPlog.Items.Count > 400) listBoxPlog.Items.Clear();
+                                listBoxPlog.Items.Add(licf.Ic.Process.P["p-" + j.ToString()]);
+                                System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcessesByName(licf.Ic.Process.P["p-" + j.ToString()]);
+                                foreach (System.Diagnostics.Process p in ps)
+                                {
+                                    Trace.WriteLine("Find and kill P name is:" + p.ProcessName);
+                                    p.Kill();
+                                }
+                            }
+                            catch (KeyNotFoundException enfx)
+                            {
+                                Trace.WriteLine(enfx.Message);
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.WriteLine(ex.Message);
+                                throw ex;
+                            }
+                        }
+                    }
+                }
+                prestatus = tmp;
+                Trace.WriteLine("Change Dev Status:" + result);
 
             }
         }
@@ -476,6 +465,50 @@ namespace small_ant
         {
             Label se = (Label)sender;
             MessageBox.Show(se.Text);
+        }
+
+        private void tbtn_aboutme_Click(object sender, EventArgs e)
+        {
+            FrmAboutMe fam = new FrmAboutMe();
+            fam.ShowDialog();
+        }
+
+        private void menuItem_SetDelay_Click(object sender, EventArgs e)
+        {
+            u2ec_example.subwindows.FrmSetDelay fsd = new u2ec_example.subwindows.FrmSetDelay(lbl_kpDelay);
+            fsd.ShowDialog();
+        }
+
+        private void btn_softreset_Click(object sender, EventArgs e)
+        {
+            if (sender.GetType().Equals(btn_softreset.GetType()))
+            {
+                MessageBox.Show(small_ant.Properties.Resources.softstartcontext,small_ant.Properties.Resources.softstarttitle,MessageBoxButtons.OK,MessageBoxIcon.Information);
+
+                cb_waitclock.Checked = false;
+                Button bsr = (Button)sender;
+                bsr.Enabled = false;
+
+                Thread.Sleep(2000);
+                tbtn_disconnect_Click(null, null);
+
+
+                Thread.Sleep(8000);
+                btn_getstatus_Click(null, null);
+                tbtn_removeport_Click(null, null);
+
+
+                Thread.Sleep(2000);
+                tbtn_addport_Click(null, null);
+
+
+                Thread.Sleep(2000);
+                tbtn_connect_Click(null, null);
+                btn_getstatus_Click(null, null);
+
+                bsr.Enabled = true;
+                cb_waitclock.Checked = true;
+            }
         }
     }
 }

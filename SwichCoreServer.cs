@@ -623,7 +623,7 @@ namespace u2ec_example
 
         private void menuItem_SetDelay_Click(object sender, EventArgs e)
         {
-            subwindows.FrmSetDelay fsd = new subwindows.FrmSetDelay(txt_kpDelay);
+            subwindows.FrmSetDelay fsd = new subwindows.FrmSetDelay(lbl_kpDelay);
             fsd.ShowDialog();
         }
 

@@ -11,9 +11,9 @@ namespace u2ec_example.subwindows
 {
     public partial class FrmSetDelay : Form
     {
-        TextBox tbs = null;
+        Label tbs = null;
 
-        public FrmSetDelay(TextBox tb)
+        public FrmSetDelay(Label tb)
         {
             InitializeComponent();
             //MessageBox.Show(tb.Text);

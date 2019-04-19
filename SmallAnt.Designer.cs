@@ -37,7 +37,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.系统SToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.设定开票系统延迟时间TToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItem_SetDelay = new System.Windows.Forms.ToolStripMenuItem();
             this.设定指令监听端口PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.退出系统XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,7 +48,7 @@
             this.tbtn_addport = new System.Windows.Forms.ToolStripMenuItem();
             this.tbtn_connect = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.关于系统IToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tbtn_aboutme = new System.Windows.Forms.ToolStripMenuItem();
             this.lbl_portnum = new System.Windows.Forms.Label();
             this.lbl_confport = new System.Windows.Forms.Label();
             this.lbl_port_stat = new System.Windows.Forms.Label();
@@ -60,6 +60,10 @@
             this.listBoxPlog = new System.Windows.Forms.ListBox();
             this.listBoxDev = new System.Windows.Forms.ListBox();
             this.btn_getstatus = new System.Windows.Forms.Button();
+            this.cb_waitclock = new System.Windows.Forms.CheckBox();
+            this.btn_softreset = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -139,7 +143,7 @@
             // 系统SToolStripMenuItem
             // 
             this.系统SToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.设定开票系统延迟时间TToolStripMenuItem,
+            this.menuItem_SetDelay,
             this.设定指令监听端口PToolStripMenuItem,
             this.toolStripSeparator1,
             this.退出系统XToolStripMenuItem});
@@ -147,11 +151,12 @@
             this.系统SToolStripMenuItem.Size = new System.Drawing.Size(82, 29);
             this.系统SToolStripMenuItem.Text = "系统(&S)";
             // 
-            // 设定开票系统延迟时间TToolStripMenuItem
+            // menuItem_SetDelay
             // 
-            this.设定开票系统延迟时间TToolStripMenuItem.Name = "设定开票系统延迟时间TToolStripMenuItem";
-            this.设定开票系统延迟时间TToolStripMenuItem.Size = new System.Drawing.Size(305, 30);
-            this.设定开票系统延迟时间TToolStripMenuItem.Text = "设定开票系统延迟时间(&T)";
+            this.menuItem_SetDelay.Name = "menuItem_SetDelay";
+            this.menuItem_SetDelay.Size = new System.Drawing.Size(305, 30);
+            this.menuItem_SetDelay.Text = "设定开票系统延迟时间(&T)";
+            this.menuItem_SetDelay.Click += new System.EventHandler(this.menuItem_SetDelay_Click);
             // 
             // 设定指令监听端口PToolStripMenuItem
             // 
@@ -175,7 +180,7 @@
             this.关于AToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.测试系统TToolStripMenuItem,
             this.toolStripSeparator2,
-            this.关于系统IToolStripMenuItem});
+            this.tbtn_aboutme});
             this.关于AToolStripMenuItem.Name = "关于AToolStripMenuItem";
             this.关于AToolStripMenuItem.Size = new System.Drawing.Size(84, 29);
             this.关于AToolStripMenuItem.Text = "关于(&A)";
@@ -188,47 +193,48 @@
             this.tbtn_addport,
             this.tbtn_connect});
             this.测试系统TToolStripMenuItem.Name = "测试系统TToolStripMenuItem";
-            this.测试系统TToolStripMenuItem.Size = new System.Drawing.Size(191, 30);
+            this.测试系统TToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
             this.测试系统TToolStripMenuItem.Text = "测试系统(&T)";
             // 
             // tbtn_disconnect
             // 
             this.tbtn_disconnect.Name = "tbtn_disconnect";
-            this.tbtn_disconnect.Size = new System.Drawing.Size(195, 30);
+            this.tbtn_disconnect.Size = new System.Drawing.Size(210, 30);
             this.tbtn_disconnect.Text = "断开连接(&D)";
             this.tbtn_disconnect.Click += new System.EventHandler(this.tbtn_disconnect_Click);
             // 
             // tbtn_removeport
             // 
             this.tbtn_removeport.Name = "tbtn_removeport";
-            this.tbtn_removeport.Size = new System.Drawing.Size(195, 30);
+            this.tbtn_removeport.Size = new System.Drawing.Size(210, 30);
             this.tbtn_removeport.Text = "移除端口(&R)";
             this.tbtn_removeport.Click += new System.EventHandler(this.tbtn_removeport_Click);
             // 
             // tbtn_addport
             // 
             this.tbtn_addport.Name = "tbtn_addport";
-            this.tbtn_addport.Size = new System.Drawing.Size(195, 30);
+            this.tbtn_addport.Size = new System.Drawing.Size(210, 30);
             this.tbtn_addport.Text = "添加端口(&A)";
             this.tbtn_addport.Click += new System.EventHandler(this.tbtn_addport_Click);
             // 
             // tbtn_connect
             // 
             this.tbtn_connect.Name = "tbtn_connect";
-            this.tbtn_connect.Size = new System.Drawing.Size(195, 30);
+            this.tbtn_connect.Size = new System.Drawing.Size(210, 30);
             this.tbtn_connect.Text = "建立连接(&C)";
             this.tbtn_connect.Click += new System.EventHandler(this.tbtn_connect_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(188, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(207, 6);
             // 
-            // 关于系统IToolStripMenuItem
+            // tbtn_aboutme
             // 
-            this.关于系统IToolStripMenuItem.Name = "关于系统IToolStripMenuItem";
-            this.关于系统IToolStripMenuItem.Size = new System.Drawing.Size(191, 30);
-            this.关于系统IToolStripMenuItem.Text = "关于系统(&I)";
+            this.tbtn_aboutme.Name = "tbtn_aboutme";
+            this.tbtn_aboutme.Size = new System.Drawing.Size(210, 30);
+            this.tbtn_aboutme.Text = "关于系统(&I)";
+            this.tbtn_aboutme.Click += new System.EventHandler(this.tbtn_aboutme_Click);
             // 
             // lbl_portnum
             // 
@@ -317,7 +323,7 @@
             // 
             this.listBoxPlog.FormattingEnabled = true;
             this.listBoxPlog.ItemHeight = 20;
-            this.listBoxPlog.Location = new System.Drawing.Point(393, 387);
+            this.listBoxPlog.Location = new System.Drawing.Point(393, 377);
             this.listBoxPlog.Name = "listBoxPlog";
             this.listBoxPlog.Size = new System.Drawing.Size(373, 124);
             this.listBoxPlog.TabIndex = 14;
@@ -326,7 +332,7 @@
             // 
             this.listBoxDev.FormattingEnabled = true;
             this.listBoxDev.ItemHeight = 20;
-            this.listBoxDev.Location = new System.Drawing.Point(393, 257);
+            this.listBoxDev.Location = new System.Drawing.Point(393, 247);
             this.listBoxDev.Name = "listBoxDev";
             this.listBoxDev.Size = new System.Drawing.Size(373, 124);
             this.listBoxDev.TabIndex = 15;
@@ -334,7 +340,7 @@
             // btn_getstatus
             // 
             this.btn_getstatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btn_getstatus.Location = new System.Drawing.Point(393, 54);
+            this.btn_getstatus.Location = new System.Drawing.Point(25, 436);
             this.btn_getstatus.Name = "btn_getstatus";
             this.btn_getstatus.Size = new System.Drawing.Size(119, 65);
             this.btn_getstatus.TabIndex = 16;
@@ -342,11 +348,59 @@
             this.btn_getstatus.UseVisualStyleBackColor = true;
             this.btn_getstatus.Click += new System.EventHandler(this.btn_getstatus_Click);
             // 
+            // cb_waitclock
+            // 
+            this.cb_waitclock.AutoSize = true;
+            this.cb_waitclock.Checked = true;
+            this.cb_waitclock.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cb_waitclock.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cb_waitclock.Location = new System.Drawing.Point(170, 316);
+            this.cb_waitclock.Name = "cb_waitclock";
+            this.cb_waitclock.Size = new System.Drawing.Size(131, 26);
+            this.cb_waitclock.TabIndex = 18;
+            this.cb_waitclock.Text = "等待状态锁";
+            this.cb_waitclock.UseVisualStyleBackColor = true;
+            // 
+            // btn_softreset
+            // 
+            this.btn_softreset.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_softreset.Location = new System.Drawing.Point(170, 436);
+            this.btn_softreset.Name = "btn_softreset";
+            this.btn_softreset.Size = new System.Drawing.Size(119, 65);
+            this.btn_softreset.TabIndex = 19;
+            this.btn_softreset.Text = "软重启键";
+            this.btn_softreset.UseVisualStyleBackColor = true;
+            this.btn_softreset.Click += new System.EventHandler(this.btn_softreset_Click);
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(25, 365);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(119, 65);
+            this.button1.TabIndex = 20;
+            this.button1.Text = "网络测试";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button2.Location = new System.Drawing.Point(170, 365);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(119, 65);
+            this.button2.TabIndex = 21;
+            this.button2.Text = "升级系统";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
             // SmallAnt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(778, 544);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btn_softreset);
+            this.Controls.Add(this.cb_waitclock);
             this.Controls.Add(this.btn_getstatus);
             this.Controls.Add(this.listBoxDev);
             this.Controls.Add(this.listBoxPlog);
@@ -390,11 +444,11 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 系统SToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 关于AToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 设定开票系统延迟时间TToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem menuItem_SetDelay;
         private System.Windows.Forms.ToolStripMenuItem 设定指令监听端口PToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem 退出系统XToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 关于系统IToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tbtn_aboutme;
         private System.Windows.Forms.Label lbl_portnum;
         private System.Windows.Forms.Label lbl_confport;
         private System.Windows.Forms.Label lbl_port_stat;
@@ -412,5 +466,9 @@
         private System.Windows.Forms.ToolStripMenuItem tbtn_removeport;
         private System.Windows.Forms.ToolStripMenuItem tbtn_addport;
         private System.Windows.Forms.ToolStripMenuItem tbtn_connect;
+        private System.Windows.Forms.CheckBox cb_waitclock;
+        private System.Windows.Forms.Button btn_softreset;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

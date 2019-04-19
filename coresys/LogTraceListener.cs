@@ -7,8 +7,10 @@ using System.Text;
 
 namespace u2ec_example.coresys
 {
-    class LogTraceListener:TraceListener
+    class LogTraceListener : TraceListener
     {
+        String logpath = Environment.CurrentDirectory + "\\";
+
         public override void Write(string message)
         {
             File.AppendAllText("d:\\log.log", message);
@@ -16,7 +18,7 @@ namespace u2ec_example.coresys
 
         public override void WriteLine(string message)
         {
-            File.AppendAllText("d:\\log.log", message+Environment.NewLine);
+            File.AppendAllText(logpath+DateTime.Now.ToShortDateString()+".log", "Jonny Speak To You At " + DateTime.Now.ToString() + "::" + message + Environment.NewLine);
         }
     }
 }

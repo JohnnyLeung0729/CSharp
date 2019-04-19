@@ -95,5 +95,23 @@ namespace small_ant.Properties {
                 return ResourceManager.GetString("iniPortError", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 软重启过程大约20秒，请耐心等待，不要进行任何操作 的本地化字符串。
+        /// </summary>
+        internal static string softstartcontext {
+            get {
+                return ResourceManager.GetString("softstartcontext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 软重启 的本地化字符串。
+        /// </summary>
+        internal static string softstarttitle {
+            get {
+                return ResourceManager.GetString("softstarttitle", resourceCulture);
+            }
+        }
     }
 }

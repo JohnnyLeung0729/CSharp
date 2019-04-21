@@ -1,4 +1,5 @@
 ﻿using small_ant.config;
+using small_ant.subwindows;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -332,85 +333,19 @@ namespace small_ant
                 //对状态进行操作，根据连接锁和状态进行判断，是否保持连接状态
                 if (!tmp.Equals(prestatus))
                 {
+                    if (tmp.Equals("connected"))//设备连接事件
+                    {
+                        startAllApp(tmp);
+                    }
+                    else if (prestatus.Equals("connected"))//设备中断事件
+                    {
+                        closeAllApp(tmp);
+                    }
                     if (cb_waitclock.Checked)
                     {
                         //如果没有连接，就打开连接，但是要勾选连接锁
                         if (tmp.Equals("added")) tbtn_connect_Click(null, null);
-                        prestatus = tmp;
-                    }
-                    if (tmp.Equals("connected"))//设备连接事件
-                    {
-                        //连接设备发送设备连接心跳码
-                        heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "0"));
-                        //遍历开启应用信息
-                        int applen = licf.Ic.Process.S.Count;
-                        for (int j = 0; j < applen; j++)
-                        {
-                            try
-                            {
-                                String filepathname = licf.Ic.Process.S["s-" + j.ToString()];
-                                String[] stemp = filepathname.Split('.');
-                                if (stemp.Length > 1)
-                                {
-                                    if (stemp[1].Equals("lnk"))
-                                    {
-                                        //Process.Start(filepathname);
-                                        Thread threadC = new Thread(closeApp);
-                                        threadC.Start(filepathname);
-                                    }
-                                    else
-                                    {
-                                        Thread threadC = new Thread(closeApp);
-                                        //threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
-                                        threadC.Start(filepathname);
-                                    }
-                                }
-                                else
-                                {
-                                    Thread threadC = new Thread(closeApp);
-                                    //threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
-                                    threadC.Start(filepathname);
-                                }
-                            }
-                            catch (KeyNotFoundException ex)
-                            {
-                                Console.Write(ex.Message);
-                            }
-                            catch (NullReferenceException ne)
-                            {
-                                Console.Write(ne.Message);
-                            }
-                        }
-                    }
-                    else if (prestatus.Equals("connected"))//设备中断事件
-                    {
-                        //断开设备
-                        //断开设备发送设备连接心跳码
-                        heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "3"));
-                        int prolen = licf.Ic.Process.P.Count;
-                        for (int j = 0; j < prolen; j++)
-                        {
-                            try
-                            {
-                                if (listBoxPlog.Items.Count > 400) listBoxPlog.Items.Clear();
-                                listBoxPlog.Items.Add(licf.Ic.Process.P["p-" + j.ToString()]);
-                                System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcessesByName(licf.Ic.Process.P["p-" + j.ToString()]);
-                                foreach (System.Diagnostics.Process p in ps)
-                                {
-                                    Trace.WriteLine("Find and kill P name is:" + p.ProcessName);
-                                    p.Kill();
-                                }
-                            }
-                            catch (KeyNotFoundException enfx)
-                            {
-                                Trace.WriteLine(enfx.Message);
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.WriteLine(ex.Message);
-                                throw ex;
-                            }
-                        }
+                        //prestatus = tmp;
                     }
                 }
                 prestatus = tmp;
@@ -508,6 +443,97 @@ namespace small_ant
 
                 bsr.Enabled = true;
                 cb_waitclock.Checked = true;
+            }
+        }
+
+        private void tbtn_viewP_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process[] gp=System.Diagnostics.Process.GetProcesses();
+            FrmListP flp = new FrmListP(gp);
+            flp.ShowDialog();
+        }
+        /// <summary>
+        /// 按顺序关闭所有配置文件中要求关闭的程序
+        /// </summary>
+        private void closeAllApp(String statusstr) {
+            //断开设备
+            //断开设备发送设备连接心跳码
+            heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "3"));
+
+            Trace.WriteLine("Close All App at status '" + statusstr + "'.");
+            int prolen = licf.Ic.Process.P.Count;
+            listBoxPlog.Items.Clear();
+            System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcesses();
+            for (int j = 0; j < prolen; j++)
+            {
+                try
+                {
+                    foreach (System.Diagnostics.Process p in ps)
+                    {
+                        if (p.ProcessName.ToString().Equals(licf.Ic.Process.P["p-" + j.ToString()])) {
+                            p.Kill();
+                            Trace.WriteLine("Find and kill P name is:" + p.ProcessName);
+                            Thread.Sleep(3000);
+                            listBoxPlog.Items.Add(licf.Ic.Process.P["p-" + j.ToString()]);
+                        }
+                    }
+                }
+                catch (KeyNotFoundException enfx)
+                {
+                    Trace.WriteLine(enfx.Message);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message);
+                    throw ex;
+                }
+            }
+        }
+
+        private void startAllApp(String statusstr)
+        {
+            //连接设备发送设备连接心跳码
+            heartbeat.postHeartbeat(heartbeat.genDataStr01(licf.Ic.Heartbeat.Nsrsbh, licf.Ic.Heartbeat.Kjh, "0"));
+
+            Trace.WriteLine("Start All App at status '" + statusstr + "'.");
+            //遍历开启应用信息
+            int applen = licf.Ic.Process.S.Count;
+            for (int j = 0; j < applen; j++)
+            {
+                try
+                {
+                    String filepathname = licf.Ic.Process.S["s-" + j.ToString()];
+                    String[] stemp = filepathname.Split('.');
+                    if (stemp.Length > 1)
+                    {
+                        if (stemp[1].Equals("lnk"))
+                        {
+                            //Process.Start(filepathname);
+                            Thread threadC = new Thread(closeApp);
+                            threadC.Start(filepathname);
+                        }
+                        else
+                        {
+                            Thread threadC = new Thread(closeApp);
+                            //threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
+                            threadC.Start(filepathname);
+                        }
+                    }
+                    else
+                    {
+                        Thread threadC = new Thread(closeApp);
+                        //threadC.Start(licf.Ic.Process.S["s-" + j.ToString()]);
+                        threadC.Start(filepathname);
+                    }
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    Trace.Write(ex.Message);
+                }
+                catch (NullReferenceException ne)
+                {
+                    Trace.Write(ne.Message);
+                }
             }
         }
     }

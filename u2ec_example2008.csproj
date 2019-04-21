@@ -132,6 +132,9 @@
     <EmbeddedResource Include="subwindows\FrmAboutMe.resx">
       <DependentUpon>FrmAboutMe.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="subwindows\FrmListP.resx">
+      <DependentUpon>FrmListP.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="subwindows\FrmSetDelay.resx">
       <DependentUpon>FrmSetDelay.cs</DependentUpon>
     </EmbeddedResource>
@@ -174,6 +177,12 @@
     </Compile>
     <Compile Include="subwindows\FrmAboutMe.Designer.cs">
       <DependentUpon>FrmAboutMe.cs</DependentUpon>
+    </Compile>
+    <Compile Include="subwindows\FrmListP.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="subwindows\FrmListP.Designer.cs">
+      <DependentUpon>FrmListP.cs</DependentUpon>
     </Compile>
     <Compile Include="subwindows\FrmSetDelay.cs">
       <SubType>Form</SubType>

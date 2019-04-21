@@ -64,6 +64,8 @@
             this.btn_softreset = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tbtn_viewP = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -191,7 +193,9 @@
             this.tbtn_disconnect,
             this.tbtn_removeport,
             this.tbtn_addport,
-            this.tbtn_connect});
+            this.tbtn_connect,
+            this.toolStripSeparator3,
+            this.tbtn_viewP});
             this.测试系统TToolStripMenuItem.Name = "测试系统TToolStripMenuItem";
             this.测试系统TToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
             this.测试系统TToolStripMenuItem.Text = "测试系统(&T)";
@@ -392,6 +396,18 @@
             this.button2.Text = "升级系统";
             this.button2.UseVisualStyleBackColor = true;
             // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(207, 6);
+            // 
+            // tbtn_viewP
+            // 
+            this.tbtn_viewP.Name = "tbtn_viewP";
+            this.tbtn_viewP.Size = new System.Drawing.Size(210, 30);
+            this.tbtn_viewP.Text = "查看进程(&V)";
+            this.tbtn_viewP.Click += new System.EventHandler(this.tbtn_viewP_Click);
+            // 
             // SmallAnt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -470,5 +486,7 @@
         private System.Windows.Forms.Button btn_softreset;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem tbtn_viewP;
     }
 }

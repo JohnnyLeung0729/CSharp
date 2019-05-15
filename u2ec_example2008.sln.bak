@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "u2ec_example2008", "u2ec_example2008.csproj", "{31413578-2E40-40D4-A73E-25DB4E31E7D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitchPcStation", "..\CSharp\SwitchPcStation\SwitchPcStation.csproj", "{9328A605-2E68-4F1C-8584-ECEDF3AC12E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitchPcStation", "..\SwitchPcStation\SwitchPcStation.csproj", "{9328A605-2E68-4F1C-8584-ECEDF3AC12E6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IniOpLibs", "IniOpLibs\IniOpLibs.csproj", "{0BC0A050-66AA-4B7A-9ECE-F465DF7EC548}"
 EndProject

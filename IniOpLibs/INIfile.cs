@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IniOpLibs
 {
-    class INIfile
+    public class INIfile
     {
         private string m_FileName;
 
